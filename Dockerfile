@@ -1,15 +1,21 @@
-FROM alpine:3.6
+FROM alpine:3.20
 MAINTAINER Feng Honglin <hfeng@tutum.co>
+
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/main"  >> /etc/apk/repositories
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community"  >> /etc/apk/repositories
+RUN apk add python2 python2-dev make g++ && rm -rf /var/cache/apk/*
+RUN python -m ensurepip --upgrade
 
 COPY . /haproxy-src
 
+    #py-pipp python2-dev ca-certificates && \
 RUN apk update && \
-    apk --no-cache add tini haproxy py-pip build-base python-dev ca-certificates && \
+    apk --no-cache add tini haproxy build-base libffi-dev openssl-dev && \
     cp /haproxy-src/reload.sh /reload.sh && \
     cd /haproxy-src && \
-    pip install -r requirements.txt && \
-    pip install . && \
-    apk del build-base python-dev && \
+    PIP_CONSTRAINT=constraint.txt pip2 install -r requirements.txt && \
+    PIP_CONSTRAINT=constraint.txt pip2 install . && \
+    apk del build-base python2-dev && \
     rm -rf "/tmp/*" "/root/.cache" `find / -regex '.*\.py[co]'`
 
 ENV RSYSLOG_DESTINATION=127.0.0.1 \
