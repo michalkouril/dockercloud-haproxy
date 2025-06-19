@@ -1,4 +1,4 @@
-FROM alpine:3.20
+FROM alpine:3.21
 MAINTAINER Feng Honglin <hfeng@tutum.co>
 
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/main"  >> /etc/apk/repositories
