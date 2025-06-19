@@ -1,6 +1,7 @@
-FROM alpine:3.22
+FROM alpine:3.20
 MAINTAINER Michal Kouril<xmkouril@gmail.com>
 
+# add python2
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/main"  >> /etc/apk/repositories
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community"  >> /etc/apk/repositories
 RUN apk add python2 python2-dev make g++ && rm -rf /var/cache/apk/*
@@ -8,7 +9,6 @@ RUN python -m ensurepip --upgrade
 
 COPY . /haproxy-src
 
-    #py-pipp python2-dev ca-certificates && \
 RUN apk update && \
     apk --no-cache add tini haproxy build-base libffi-dev openssl-dev && \
     cp /haproxy-src/reload.sh /reload.sh && \
