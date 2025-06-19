@@ -276,7 +276,7 @@ class HaproxyConfigFrontendTestCase(unittest.TestCase):
             {'service_alias': 'HW', 'path': '', 'host': 'a.com', 'scheme': 'http', 'port': '80'}]
         self.assertEqual(OrderedDict([('frontend port_80',
                                        ['bind :80',
-                                        'reqadd X-Forwarded-Proto:\\ http',
+                                        'http-request set-header X-Forwarded-Proto http',
                                         'maxconn 4096',
                                         'acl is_websocket hdr(Upgrade) -i WebSocket',
                                         'acl host_rule_1 hdr(host) -i a.com',
@@ -295,7 +295,7 @@ class HaproxyConfigFrontendTestCase(unittest.TestCase):
         mock_vhosts.return_value = []
         self.assertEqual(OrderedDict([('frontend default_port_80',
                                        ['bind :80',
-                                        'reqadd X-Forwarded-Proto:\\ http',
+                                        'http-request set-header X-Forwarded-Proto http',
                                         'maxconn 4096',
                                         'default_backend default_service'])]),
                          haproxy._config_frontend_sections())

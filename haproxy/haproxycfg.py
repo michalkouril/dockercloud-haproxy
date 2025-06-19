@@ -167,6 +167,7 @@ class Haproxy(object):
             cfg_dict.update(self._config_frontend_sections())
             cfg_dict.update(self._config_backend_sections())
             cfg_dict.update(self._config_adittional_backends_sections())
+            cfg_dict.update(self._config_aditional_comment_sections("This is the end"))
 
             cfg = prettify(cfg_dict)
             self._update_haproxy(cfg)
@@ -414,5 +415,13 @@ class Haproxy(object):
         if ADDITIONAL_BACKENDS:
             for key in ADDITIONAL_BACKENDS:
                 cfg["backend %s" % key] = ADDITIONAL_BACKENDS[key]
+
+        return cfg
+
+    def _config_aditional_comment_sections(self, comment):
+        cfg = OrderedDict()
+
+        cfg["# %s" % comment] = "\n"
+        cfg[""] = "\n"
 
         return cfg

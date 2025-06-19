@@ -54,7 +54,7 @@ def prettify(cfg, indent="  "):
         text += "%s\n" % section
         for content in contents:
             text += "%s%s\n" % (indent, content)
-    return text.strip()
+    return text.strip()+"\n"
 
 
 def get_service_attribute(details, attr_name, service_alias=None):
