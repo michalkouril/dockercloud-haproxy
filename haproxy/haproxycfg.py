@@ -166,7 +166,7 @@ class Haproxy(object):
             cfg_dict.update(self._config_tcp_sections())
             cfg_dict.update(self._config_frontend_sections())
             cfg_dict.update(self._config_backend_sections())
-            cfg_dict.update(self._config_adittional_backends_sections())
+            cfg_dict.update(self._config_aditional_backends_sections())
             cfg_dict.update(self._config_aditional_comment_sections("This is the end"))
 
             cfg = prettify(cfg_dict)
@@ -410,7 +410,7 @@ class Haproxy(object):
                     cfg["backend default_service"] = backend
         return cfg
 
-    def _config_adittional_backends_sections(self):
+    def _config_aditional_backends_sections(self):
         cfg = OrderedDict()
 
         if ADDITIONAL_BACKENDS:
