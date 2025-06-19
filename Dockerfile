@@ -1,4 +1,4 @@
-FROM alpine:3.20
+FROM alpine:3.21
 MAINTAINER Michal Kouril<xmkouril@gmail.com>
 
 # add python2
