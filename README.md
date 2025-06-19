@@ -1,13 +1,16 @@
 # dockercloud/haproxy
 
-## Notice: Unfortunately, this project is currently put into maintenance mode. Please do not send any PR for new features. We will still fix bugs if there is any.
+**Updated to alpine 3.22/haproxy 3.2**
+
+
+## The original notice: Unfortunately, this project is currently put into maintenance mode. Please do not send any PR for new features. We will still fix bugs if there is any.
 
 HAProxy image that balances between linked containers and, if launched in Docker Cloud or using Docker Compose v2,
 reconfigures itself when a linked cluster member redeploys, joins or leaves.
 
 ## Version
 
-The available version can be found here: https://hub.docker.com/r/dockercloud/haproxy/tags/
+The available version can be found here: [https://hub.docker.com/r/applibs/dockercloud-haproxy/tags/](https://hub.docker.com/r/applibs/dockercloud-haproxy/tags/)
  - `latest` is built against master branch
  - `staging` is built against staging branch
  - `x.x.x` is built against git tags on github
@@ -16,7 +19,7 @@ The available version can be found here: https://hub.docker.com/r/dockercloud/ha
 
 ## Usage
 
-You can use `dockercloud/haproxy` in three different ways:
+You can use `applibs/dockercloud-haproxy` in three different ways:
 
 - running in Docker Cloud (Cloud Mode)
 - running with Docker legacy links (Legacy Mode)
