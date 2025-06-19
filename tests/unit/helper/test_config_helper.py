@@ -12,6 +12,10 @@ class ConfigHelperTestCase(unittest.TestCase):
         self.assertEqual([], config_ssl_bind_ciphers(""))
         self.assertEqual(["ssl-default-bind-ciphers AES"], config_ssl_bind_ciphers("AES"))
 
+    def test_config_ssl_bind_ciphersuites(self):
+        self.assertEqual([], config_ssl_bind_ciphersuites(""))
+        self.assertEqual(["ssl-default-bind-ciphersuites AES"], config_ssl_bind_ciphersuites("AES"))
+
     def test_extra_setting(self):
         self.assertEqual([], config_extra_settings(""))
         self.assertEqual(["abc"], config_extra_settings("abc"))

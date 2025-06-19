@@ -15,6 +15,13 @@ def config_ssl_bind_ciphers(ssl_bind_ciphers):
     return statements
 
 
+def config_ssl_bind_ciphersuites(ssl_bind_ciphersuites):
+    statements = []
+    if ssl_bind_ciphersuites:
+        statements.append("ssl-default-bind-ciphersuites %s" % ssl_bind_ciphersuites)
+    return statements
+
+
 def config_extra_settings(extra_settings):
     statements = []
     if extra_settings:

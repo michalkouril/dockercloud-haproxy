@@ -255,6 +255,7 @@ class Haproxy(object):
 
         statements.extend(ConfigHelper.config_ssl_bind_options(SSL_BIND_OPTIONS))
         statements.extend(ConfigHelper.config_ssl_bind_ciphers(SSL_BIND_CIPHERS))
+        statements.extend(ConfigHelper.config_ssl_bind_ciphersuites(SSL_BIND_CIPHERSUITES))
         statements.extend(ConfigHelper.config_extra_settings(EXTRA_GLOBAL_SETTINGS))
         if EXTRA_GLOBAL_SETTINGS_FILE:
             try:
