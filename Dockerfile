@@ -1,5 +1,5 @@
-FROM alpine:3.21
-MAINTAINER Feng Honglin <hfeng@tutum.co>
+FROM alpine:3.22
+MAINTAINER Michal Kouril<xmkouril@gmail.com>
 
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/main"  >> /etc/apk/repositories
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community"  >> /etc/apk/repositories
