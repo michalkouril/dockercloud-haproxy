@@ -1,6 +1,6 @@
 # dockercloud/haproxy
 
-**Updated to alpine 3.22/haproxy 3.2**
+**Updated to alpine 3.22/haproxy 3.2 (6/19/2025)**
 
 
 ## The original notice: Unfortunately, this project is currently put into maintenance mode. Please do not send any PR for new features. We will still fix bugs if there is any.
