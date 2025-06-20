@@ -32,7 +32,8 @@ ENV RSYSLOG_DESTINATION=127.0.0.1 \
     HEALTH_CHECK="check inter 2000 rise 2 fall 3" \
     NBPROC=1
 
-USER haproxy
+# can't run as non-root user since we generate config to /haproxy.cfg
+# USER haproxy
 EXPOSE 80 443 1936
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["dockercloud-haproxy"]
