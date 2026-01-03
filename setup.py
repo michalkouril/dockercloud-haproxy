@@ -5,8 +5,8 @@ import re
 from setuptools import setup, find_packages
 
 requirements = [
-    "python-dockercloud >= 1.0.3, < 2",
-    "docker-compose >= 1.6.0, <2"
+    # "python-dockercloud >= 1.0.3, < 2",
+    # "docker-compose >= 1.6.0, <2"
     ]
 
 

@@ -66,7 +66,7 @@ def get_service_attribute(details, attr_name, service_alias=None):
             return None
     else:
         # Randomly pick a None value from the linked service
-        for _service_alias in details.iterkeys():
+        for _service_alias in details.keys():
             try:
                 if details[_service_alias][attr_name]:
                     return details[_service_alias][attr_name]

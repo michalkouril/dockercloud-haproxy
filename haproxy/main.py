@@ -9,10 +9,10 @@ import signal
 import gevent
 import time
 import dockercloud
-from compose.cli.docker_client import docker_client
+import docker
 from gevent import queue
 
-import config
+from haproxy.config import config
 from config import DEBUG, PID_FILE, HAPROXY_CONTAINER_URI, HAPROXY_SERVICE_URI, API_AUTH
 from eventhandler import on_user_reload, listen_docker_events_compose_mode, listen_dockercloud_events, \
     polling_service_status_swarm_mode
@@ -95,9 +95,9 @@ def check_running_mode(container_uri, service_uri, api_auth):
         reason = ""
         try:
             try:
-                docker = docker_client()
+                docker = docker.from_env()
             except:
-                docker = docker_client(os.environ)
+                docker = docker.from_env(os.environ)
             docker.ping()
         except Exception as e:
             reason = "unable to connect to docker daemon %s" % e

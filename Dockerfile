@@ -2,21 +2,34 @@ FROM alpine:3.22
 MAINTAINER Michal Kouril<xmkouril@gmail.com>
 
 # add python2
-RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/main"  >> /etc/apk/repositories
-RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community"  >> /etc/apk/repositories
-RUN apk add python2 python2-dev make g++ && rm -rf /var/cache/apk/*
-RUN python -m ensurepip --upgrade
+# RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/main"  >> /etc/apk/repositories
+# RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.15/community"  >> /etc/apk/repositories
+# RUN apk add python2 python2-dev make g++ && rm -rf /var/cache/apk/*
+RUN apk add python3 python3-dev py3-pip make g++ git && rm -rf /var/cache/apk/*
+# RUN python3 -m ensurepip --upgrade --break-system-packages
 
 COPY . /haproxy-src
 
-RUN apk update && \
-    apk --no-cache add tini haproxy build-base libffi-dev openssl-dev && \
-    cp /haproxy-src/reload.sh /reload.sh && \
-    cd /haproxy-src && \
-    PIP_CONSTRAINT=constraint.txt pip2 install -r requirements.txt && \
-    PIP_CONSTRAINT=constraint.txt pip2 install . && \
-    apk del build-base python2-dev && \
-    rm -rf "/tmp/*" "/root/.cache" `find / -regex '.*\.py[co]'`
+RUN apk update
+# RUN pip3 install future --break-system-packages
+RUN apk --no-cache add tini haproxy build-base libffi-dev openssl-dev py3-cached-property py3-docker-py py3-docopt py3-jsonschema py3-texttable py3-requests py3-six py3-websocket-client py3-gevent py3-dockerpty py3-future
+# py3-pyaml
+# py3-future
+# RUN pip3 install "PyYAML>6.0" --break-system-packages
+# RUN pip3 install "cython>=3.0.0" --break-system-packages
+# RUN pip3 install "PyYAML<5.4.0" --break-system-packages
+# RUN pip3 install "cython<3.0.0" --break-system-packages
+# RUN pip3 install docker-compose --break-system-packages
+# RUN pip3 install python-dockercloud --break-system-packages
+RUN cp /haproxy-src/reload.sh /reload.sh
+#PIP_CONSTRAINT=constraint.txt pip3 install -r requirements.txt
+# RUN cd /haproxy-src && \
+#     PIP_CONSTRAINT=constraint.txt pip3 install . --break-system-packages && \
+#     apk del build-base python3-dev && \
+#     rm -rf "/tmp/*" "/root/.cache" `find / -regex '.*\.py[co]'`
+RUN pip3 install  git+https://github.com/michalkouril/python-dockercloud.git --break-system-packages
+RUN cd /haproxy-src && \
+    pip3 install . --break-system-packages
 
 ENV RSYSLOG_DESTINATION=127.0.0.1 \
     MODE=http \

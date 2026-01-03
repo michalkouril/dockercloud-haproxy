@@ -67,7 +67,7 @@ def _calc_links(docker, linked_compose_services, project):
 def get_container_endpoints(container, container_name):
     endpoints = {}
     container_endpoints = container.get("Config", {}).get("ExposedPorts", {})
-    for k, v in container_endpoints.iteritems():
+    for k, v in container_endpoints.items():
         if k:
             terms = k.split("/", 1)
             port = terms[0]
@@ -100,7 +100,7 @@ def _get_linked_compose_services(networks, project):
     prefix_len = len(prefix)
 
     haproxy_links = []
-    for network in networks.itervalues():
+    for network in networks.values():
         network_links = network.get("Links", [])
         if network_links:
             haproxy_links.extend(network_links)
@@ -118,8 +118,8 @@ def _get_linked_compose_services(networks, project):
 
 
 def get_service_links_str(links):
-    return sorted(set([link.get("service_name") for link in links.itervalues()]))
+    return sorted(set([link.get("service_name") for link in links.values()]))
 
 
 def get_container_links_str(haproxy_links):
-    return sorted(set([link.get("container_name") for link in haproxy_links.itervalues()]))
+    return sorted(set([link.get("container_name") for link in haproxy_links.values()]))

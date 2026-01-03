@@ -17,7 +17,7 @@ class LegacySpecs(Specs):
     @staticmethod
     def _parse_service_aliases(envvars):
         service_aliases = []
-        for key, value in envvars.iteritems():
+        for key, value in envvars.items():
             match = haproxy.config.SERVICE_ALIAS_MATCH.search(key)
             if match:
                 detailed_match = haproxy.config.DETAILED_SERVICE_ALIAS_MATCH.search(key)
@@ -33,12 +33,12 @@ class LegacySpecs(Specs):
     @staticmethod
     def _parse_details(service_aliases, envvars):
         env_parser = LegacyEnvParser(service_aliases)
-        for key, value in envvars.iteritems():
+        for key, value in envvars.items():
             env_parser.parse(key, value)
         details = env_parser.get_details()
 
         # generate empty details if there is no environment variables set in the application services
-        for service_alias in set(service_aliases) - set(details.iterkeys()):
+        for service_alias in set(service_aliases) - set(details.keys()):
             env_parser.parse(service_alias + "_ENV_", "")
 
         return env_parser.get_details()
@@ -46,7 +46,7 @@ class LegacySpecs(Specs):
     @staticmethod
     def _parse_routes(details, envvars):
         routes = {}
-        for key, value in envvars.iteritems():
+        for key, value in envvars.items():
             if not key or not value:
                 continue
             match = haproxy.config.SERVICE_ALIAS_MATCH.search(key)

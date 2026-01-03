@@ -25,7 +25,7 @@ def parse_extra_frontend_settings(envvars):
     if isinstance(envvars, os._Environ) or isinstance(envvars, dict):
         frontend_settings_pattern = re.compile(r"^EXTRA_FRONTEND_SETTINGS_(\d{1,5})$")
         frontend_settings_file_pattern = re.compile(r"^EXTRA_FRONTEND_SETTINGS_FILE_(\d{1,5})$")
-        for k, v in envvars.iteritems():
+        for k, v in envvars.items():
             settings = []
             match = frontend_settings_pattern.match(k)
             file_match = frontend_settings_file_pattern.match(k)
@@ -54,7 +54,7 @@ def parse_additional_backend_settings(envvars):
     if isinstance(envvars, os._Environ) or isinstance(envvars, dict):
         additional_backend_pattern = re.compile(r"^ADDITIONAL_BACKEND_(\w+)$")
         additional_backend_file_pattern = re.compile(r"^ADDITIONAL_BACKEND_FILE_(\w+)$")
-        for k, v in envvars.iteritems():
+        for k, v in envvars.items():
             settings = []
             match = additional_backend_pattern.match(k)
             file_match = additional_backend_file_pattern.match(k)

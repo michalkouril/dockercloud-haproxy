@@ -19,7 +19,7 @@ def get_swarm_mode_haproxy_id_nets(docker, haproxy_container_short_id):
         return "", set()
 
     haproxy_nets = set([network.get("NetworkID", "") for name, network in
-                        haproxy_container.get("NetworkSettings", {}).get("Networks", {}).iteritems()
+                        haproxy_container.get("NetworkSettings", {}).get("Networks", {}).items()
                         if name != "ingress"])
 
     return haproxy_service_id, haproxy_nets

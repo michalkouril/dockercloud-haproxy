@@ -39,7 +39,7 @@ def _init_links(container_links):
 
 
 def _get_new_added_link_uri(container_object_cache, links):
-    return filter(lambda x: x not in container_object_cache, links)
+    return list(filter(lambda x: x not in container_object_cache, links))
 
 
 def _get_container_object_from_uri(container_uris):
@@ -68,17 +68,17 @@ def _get_linked_containers(cache, container_links):
 
 def get_linked_services(haproxy_links):
     linked_services = set()
-    for link in haproxy_links.itervalues():
+    for link in haproxy_links.values():
         linked_services.add(link["service_uri"])
     return set(linked_services)
 
 
 def get_service_links_str(haproxy_links):
     return sorted(set(["%s(%s)" % (link.get("service_name"), get_uuid_from_resource_uri(link.get("service_uri", "")))
-                       for link in haproxy_links.itervalues()]))
+                       for link in haproxy_links.values()]))
 
 
 def get_container_links_str(haproxy_links):
     return sorted(
         set(["%s(%s)" % (link.get("container_name"), get_uuid_from_resource_uri(link.get("container_uri", "")))
-             for link in haproxy_links.itervalues()]))
+             for link in haproxy_links.values()]))

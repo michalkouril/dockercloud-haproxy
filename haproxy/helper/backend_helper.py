@@ -24,7 +24,7 @@ def get_backend_section(details, routes, vhosts, service_alias, routes_added):
 
 def get_backend_routes(route_setting, is_sticky, routes, routes_added, service_alias, details):
     backend_routes = []
-    for _service_alias, routes in routes.iteritems():
+    for _service_alias, routes in routes.items():
         if not service_alias or _service_alias == service_alias:
             addresses_added = []
             for route in routes:

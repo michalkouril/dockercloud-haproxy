@@ -7,7 +7,7 @@ from haproxy.config import EXTRA_BIND_SETTINGS, EXTRA_FRONTEND_SETTINGS, MONITOR
 def check_require_default_route(routes, routes_added):
     require_default_route = False
     all_routes = []
-    for route_list in routes.itervalues():
+    for route_list in routes.values():
         all_routes.extend(route_list)
     if len(routes_added) < len(all_routes):
         require_default_route = True
@@ -47,7 +47,7 @@ def config_frontend_with_virtual_host(vhosts, ssl_bind_string):
             frontend_section.extend(acl_rule)
 
         frontend_dict[port] = frontend_section
-    for port, frontend_section in frontend_dict.iteritems():
+    for port, frontend_section in frontend_dict.items():
         cfg["frontend port_%s" % port] = frontend_section
     return cfg, monitor_uri_configured
 

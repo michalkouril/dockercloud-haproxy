@@ -14,7 +14,7 @@ class NewSpecs(Specs):
     @staticmethod
     def _parse_service_aliases(links):
         service_aliases = []
-        for link in links.itervalues():
+        for link in links.values():
             if link["service_name"] not in service_aliases:
                 service_aliases.append(link["service_name"])
         return service_aliases
@@ -22,7 +22,7 @@ class NewSpecs(Specs):
     @staticmethod
     def _parse_details(service_aliases, links):
         env_parser = NewEnvParser(service_aliases)
-        for link in links.itervalues():
+        for link in links.values():
             for envvar in link['container_envvars']:
                 env_parser.parse(link['service_name'], envvar['key'], envvar['value'])
         details = env_parser.get_details()
@@ -31,12 +31,12 @@ class NewSpecs(Specs):
     @staticmethod
     def _parse_routes(details, links):
         routes = {}
-        for link in links.itervalues():
+        for link in links.values():
             container_name = link["container_name"]
             service_alias = link["service_name"]
             if service_alias not in routes:
                 routes[service_alias] = []
-            for endpoint in link["endpoints"].itervalues():
+            for endpoint in link["endpoints"].values():
                 route = haproxy.config.BACKEND_MATCH.match(endpoint).groupdict()
                 route.update({"container_name": container_name})
                 exclude_ports = details.get(service_alias, {}).get("exclude_ports", [])

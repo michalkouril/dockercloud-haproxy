@@ -31,7 +31,7 @@ def get_tcp_routes(details, routes, port, port_num):
     if port != port_num and port != port_num + "/ssl":
         return tcp_routes, routes_added
 
-    for _service_alias, routes in routes.iteritems():
+    for _service_alias, routes in routes.items():
         tcp_ports = get_service_attribute(details, "tcp_ports", _service_alias)
         if tcp_ports and port in tcp_ports:
             for route in routes:

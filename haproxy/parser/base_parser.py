@@ -1,4 +1,4 @@
-import urlparse
+import urllib.parse as urlparse
 
 
 class Specs(object):
@@ -12,7 +12,7 @@ class Specs(object):
         services_with_same_vhost = {}
         unique_vhost = {}
 
-        for service_alias, detail in self.details.iteritems():
+        for service_alias, detail in self.details.items():
             vhost_str = detail['virtual_host_str']
             if vhost_str:
                 if vhost_str in unique_vhost:
@@ -39,7 +39,7 @@ class Specs(object):
 
     @staticmethod
     def _parse_vhosts(details):
-        for service_alias, attr in details.iteritems():
+        for service_alias, attr in details.items():
             virtual_host_str = attr["virtual_host_str"] = attr["virtual_host"]
 
             parsed_virtual_host = []
@@ -61,7 +61,7 @@ class Specs(object):
             details[service_alias]["virtual_host"] = parsed_virtual_host
 
         vhosts = []
-        for service_alias, attr in details.iteritems():
+        for service_alias, attr in details.items():
             virtual_hosts = attr["virtual_host"]
 
             if virtual_hosts:
@@ -89,15 +89,16 @@ class Specs(object):
 
     def get_default_ssl_cert(self):
         if not hasattr(self, "default_ssl_cert"):
-            self.default_ssl_cert = filter(lambda x: x,
-                                           [attr["default_ssl_cert"] for attr in self.details.itervalues() if
-                                            "default_ssl_cert" in attr])
+            self.default_ssl_cert = list(filter(lambda x: x,
+                                               [attr["default_ssl_cert"] for attr in self.details.values() if
+                                                "default_ssl_cert" in attr]))
         return self.default_ssl_cert
 
     def get_ssl_cert(self):
         if not hasattr(self, "ssl_cert"):
-            self.ssl_cert = filter(lambda x: x, [attr["ssl_cert"] for attr in self.details.itervalues() if
-                                                 "ssl_cert" in attr])
+            self.ssl_cert = list(filter(lambda x: x,
+                                        [attr["ssl_cert"] for attr in self.details.values() if
+                                         "ssl_cert" in attr]))
         return self.ssl_cert
 
 
