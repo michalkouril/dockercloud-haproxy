@@ -1,6 +1,6 @@
 # dockercloud/haproxy
 
-**Updated to alpine 3.22/haproxy 3.2 (6/19/2025)**
+**Updated to ubuntu 24.04/haproxy 2.8 (1/3/2026)**
 
 HAProxy image that balances between linked containers and, if launched in Docker Cloud or using Docker Compose v2,
 reconfigures itself when a linked cluster member redeploys, joins or leaves.
