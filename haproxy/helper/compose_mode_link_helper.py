@@ -1,5 +1,7 @@
 import logging
 
+from haproxy.utils import docker_inspect_container
+
 logger = logging.getLogger("haproxy")
 
 
@@ -45,7 +47,7 @@ def _calc_links(docker, linked_compose_services, project):
     links = {}
     for _container in docker.containers():
         container_id = _container.get("Id", "")
-        container = docker.inspect_container(container_id)
+        container = docker_inspect_container(docker, container_id)
         compose_labels = container.get("Config", {}).get("Labels", {})
         compose_project = compose_labels.get("com.docker.compose.project", "")
         compose_service = compose_labels.get("com.docker.compose.service", "")
@@ -96,7 +98,7 @@ def get_container_envvars(container):
 
 
 def _get_linked_compose_services(networks, project):
-    prefix = "%s_" % project
+    prefix = "%s-" % project
     prefix_len = len(prefix)
 
     haproxy_links = []
@@ -110,7 +112,7 @@ def _get_linked_compose_services(networks, project):
         terms = link.strip().split(":")
         service = terms[0].strip()
         if service and service.startswith(prefix):
-            last = service.rfind("_")
+            last = service.rfind("-")
             linked_service = service[prefix_len:last]
             if linked_service not in linked_services:
                 linked_services.append(linked_service)

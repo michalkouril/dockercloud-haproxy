@@ -16,12 +16,14 @@ def parse_extra_bind_settings(extra_bind_settings):
         for setting in settings:
             term = setting.split(":", 1)
             if len(term) == 2:
-                bind_dict[term[0].strip().replace("\,", ",")] = term[1].strip().replace("\,", ",")
+                bind_dict[term[0].strip().replace("\\,", ",")] = term[1].strip().replace("\\,", ",")
     return bind_dict
 
 
 def parse_extra_frontend_settings(envvars):
     settings_dict = {}
+    file_settings = {}
+    env_settings = {}
     if isinstance(envvars, os._Environ) or isinstance(envvars, dict):
         frontend_settings_pattern = re.compile(r"^EXTRA_FRONTEND_SETTINGS_(\d{1,5})$")
         frontend_settings_file_pattern = re.compile(r"^EXTRA_FRONTEND_SETTINGS_FILE_(\d{1,5})$")
@@ -31,7 +33,9 @@ def parse_extra_frontend_settings(envvars):
             file_match = frontend_settings_file_pattern.match(k)
             if match:
                 port = match.group(1)
-                settings.extend([x.strip().replace("\,", ",") for x in re.split(r'(?<!\\),', v.strip())])
+                settings.extend([x.strip().replace("\\,", ",") for x in re.split(r'(?<!\\),', v.strip())])
+                if settings:
+                    env_settings.setdefault(port, []).extend(settings)
             elif file_match:
                 port = file_match.group(1)
                 try:
@@ -40,12 +44,10 @@ def parse_extra_frontend_settings(envvars):
                             settings.append(line.strip())
                 except Exception as e:
                     logger.info("Error reading %s at '%s', error %s" % (k, v, e))
-
-            if len(settings) > 0:
-                if port in settings_dict:
-                    settings_dict[port].extend(settings)
-                else:
-                    settings_dict[port] = settings
+                if settings:
+                    file_settings.setdefault(port, []).extend(settings)
+        for port in set(list(file_settings.keys()) + list(env_settings.keys())):
+            settings_dict[port] = file_settings.get(port, []) + env_settings.get(port, [])
     return settings_dict
 
 
@@ -69,7 +71,7 @@ def parse_additional_backend_settings(envvars):
                     logger.info("Error reading %s at '%s', error %s" % (k, v, e))
             elif match:
                 server = match.group(1)
-                settings.extend([x.strip().replace("\,", ",") for x in re.split(r'(?<!\\),', v.strip())])
+                settings.extend([x.strip().replace("\\,", ",") for x in re.split(r'(?<!\\),', v.strip())])
 
             if len(settings) > 0:
                 if server in settings_dict:
@@ -115,6 +117,8 @@ SSL_BIND_CIPHERSUITES = os.getenv("SSL_BIND_CIPHERSUITES")
 SSL_BIND_OPTIONS = os.getenv("SSL_BIND_OPTIONS")
 STATS_AUTH = os.getenv("STATS_AUTH", "stats:stats")
 STATS_PORT = os.getenv("STATS_PORT", "1936")
+STATS_SOCKET = os.getenv("STATS_SOCKET", "/var/run/haproxy.stats")
+HAPROXY_PID_FILE = os.getenv("HAPROXY_PID_FILE", "/var/run/haproxy.pid")
 TIMEOUT = os.getenv("TIMEOUT", "connect 5000, client 50000, server 50000")
 NBPROC = int(os.getenv("NBPROC", 1))
 SWARM_MODE_POLLING_INTERVAL = int(os.getenv("SWARM_MODE_POLLING_INTERVAL", 5))
@@ -128,7 +132,7 @@ RUNNING_MODE = None
 # const
 CERT_DIR = "/certs/"
 CACERT_DIR = "/cacerts/"
-HAPROXY_CONFIG_FILE = "/haproxy.cfg"
+HAPROXY_CONFIG_FILE = os.getenv("HAPROXY_CONFIG_FILE", "/haproxy.cfg")
 HAPROXY_RUN_COMMAND = ['/usr/sbin/haproxy', '-f', HAPROXY_CONFIG_FILE, '-db', '-q']
 HAPROXY_CONFIG_CHECK_COMMAND = ['/usr/sbin/haproxy', '-c', '-f', HAPROXY_CONFIG_FILE]
 API_RETRY = 10  # seconds

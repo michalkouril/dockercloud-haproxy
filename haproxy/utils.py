@@ -1,9 +1,10 @@
 import logging
+import os
 import time
 
 import dockercloud
 
-import config
+from . import config
 
 logger = logging.getLogger("haproxy")
 
@@ -40,9 +41,14 @@ def get_uuid_from_resource_uri(uri):
 
 def save_to_file(name, content):
     try:
+        if isinstance(name, int):
+            fd = os.dup(name)
+            with os.fdopen(fd, 'w') as f:
+                f.write(content)
+            return True
         with open(name, 'w') as f:
             f.write(content)
-            return True
+        return True
     except Exception as e:
         logger.error("Cannot write to file(%s): %s" % (name, e))
         return False
@@ -54,7 +60,7 @@ def prettify(cfg, indent="  "):
         text += "%s\n" % section
         for content in contents:
             text += "%s%s\n" % (indent, content)
-    return text.strip()+"\n"
+    return text.strip()
 
 
 def get_service_attribute(details, attr_name, service_alias=None):
@@ -80,3 +86,13 @@ def get_bind_string(enable_ssl, port_num, ssl_bind_string, bind_settings):
     if enable_ssl:
         bind_string = " ".join([bind_string.strip(), ssl_bind_string])
     return bind_string.strip()
+
+
+def docker_inspect_container(docker_client, container_id):
+    inspect = getattr(docker_client, "inspect_container", None)
+    if inspect:
+        return inspect(container_id)
+    api = getattr(docker_client, "api", None)
+    if api and hasattr(api, "inspect_container"):
+        return api.inspect_container(container_id)
+    raise AttributeError("Docker client does not support inspect_container")

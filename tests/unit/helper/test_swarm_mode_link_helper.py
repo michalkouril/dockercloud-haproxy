@@ -926,8 +926,8 @@ class SWARMModeLinkHelperTestCase(unittest.TestCase):
                 raise Exception("an exception")
 
         service_id, nets = get_swarm_mode_haproxy_id_nets(Docker(), "exception")
-        self.assertEquals("", service_id)
-        self.assertEquals(set(), nets)
+        self.assertEqual("", service_id)
+        self.assertEqual(set(), nets)
 
     def test_get_new_added_links_uri(self):
         class Docker:
@@ -935,8 +935,8 @@ class SWARMModeLinkHelperTestCase(unittest.TestCase):
                 return haproxy_inspect
 
         service_id, nets = get_swarm_mode_haproxy_id_nets(Docker(), "id")
-        self.assertEquals(expected_service_id, service_id)
-        self.assertEquals(expected_nets, nets)
+        self.assertEqual(expected_service_id, service_id)
+        self.assertEqual(expected_nets, nets)
 
     def test_get_swarm_mode_links(self):
         class Docker:
@@ -947,15 +947,15 @@ class SWARMModeLinkHelperTestCase(unittest.TestCase):
                 return [t for t in tasks if t.get("DesiredState", "") == "running"]
 
         links, linked_tasks = get_swarm_mode_links(Docker(), expected_service_id, expected_nets)
-        self.assertEquals(expected_links, links)
-        self.assertEquals(expected_linked_tasks, linked_tasks)
+        self.assertEqual(expected_links, links)
+        self.assertEqual(expected_linked_tasks, linked_tasks)
 
     def test_get_task_links(self):
         links, linked_tasks = get_task_links([t for t in tasks if t.get("DesiredState", "") == "running"],
                                              services, expected_service_id, expected_nets)
-        self.assertEquals(expected_links, links)
-        self.assertEquals(expected_linked_tasks, linked_tasks)
+        self.assertEqual(expected_links, links)
+        self.assertEqual(expected_linked_tasks, linked_tasks)
 
     def test_get_tasks_envvars(self):
         envvar = get_task_envvars(tasks[0].get("Spec", {}).get("ContainerSpec", {}).get("Env", []))
-        self.assertEquals([{'value': u'80', 'key': u'SERVICE_PORTS'}], envvar)
+        self.assertEqual([{'value': u'80', 'key': u'SERVICE_PORTS'}], envvar)

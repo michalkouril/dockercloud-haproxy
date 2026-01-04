@@ -19,7 +19,7 @@ class ParseExtraFrontendSettings(unittest.TestCase):
     def test_parse_extra_frontend_settings(self):
         self.assertEqual({}, parse_extra_frontend_settings(""))
         self.assertEqual({}, parse_extra_frontend_settings({}))
-        tf = tempfile.NamedTemporaryFile();
+        tf = tempfile.NamedTemporaryFile(mode="w+")
         tf.write("reqadd file_header value99")
         tf.flush()
 

@@ -16,9 +16,9 @@ class Specs(object):
             vhost_str = detail['virtual_host_str']
             if vhost_str:
                 if vhost_str in unique_vhost:
-                    services_with_same_vhost[service_alias] = unique_vhost[vhost_str]
-                else:
-                    unique_vhost[vhost_str] = service_alias
+                    previous_alias = unique_vhost[vhost_str]
+                    services_with_same_vhost[previous_alias] = service_alias
+                unique_vhost[vhost_str] = service_alias
 
         for service_alias in services_with_same_vhost:
             self.service_aliases.remove(service_alias)

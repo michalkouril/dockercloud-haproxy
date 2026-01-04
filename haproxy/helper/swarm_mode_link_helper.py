@@ -1,14 +1,15 @@
 import logging
 
-import compose_mode_link_helper
+from . import compose_mode_link_helper
 from haproxy.config import SERVICE_PORTS_ENVVAR_NAME, LABEL_SWARM_MODE_DEACTIVATE
+from haproxy.utils import docker_inspect_container
 
 logger = logging.getLogger("haproxy")
 
 
 def get_swarm_mode_haproxy_id_nets(docker, haproxy_container_short_id):
     try:
-        haproxy_container = docker.inspect_container(haproxy_container_short_id)
+        haproxy_container = docker_inspect_container(docker, haproxy_container_short_id)
     except Exception as e:
         logger.info("Docker API error, regressing to legacy links mode: %s" % e)
         return "", set()

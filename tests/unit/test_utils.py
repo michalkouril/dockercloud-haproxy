@@ -41,7 +41,7 @@ class GetUuidFromResourceUriTestCase(unittest.TestCase):
 
 class SaveToFileTestCase(unittest.TestCase):
     def setUp(self):
-        self.f = tempfile.TemporaryFile()
+        self.f = tempfile.NamedTemporaryFile(mode="w+", delete=False)
 
     def tearDown(self):
         self.f.close()

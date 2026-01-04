@@ -7,11 +7,11 @@ import dockercloud
 from compose.cli.docker_client import docker_client
 from docker.errors import APIError
 
-import config
-import helper.cloud_mode_link_helper
-import helper.swarm_mode_link_helper as SwarmModeLinkHelper
-from haproxycfg import add_haproxy_run_task, Haproxy
-from utils import get_uuid_from_resource_uri
+from . import config
+from .helper import cloud_mode_link_helper
+from .helper import swarm_mode_link_helper as SwarmModeLinkHelper
+from .haproxycfg import add_haproxy_run_task, Haproxy
+from .utils import get_uuid_from_resource_uri
 
 logger = logging.getLogger("haproxy")
 
@@ -39,7 +39,7 @@ def on_cloud_event(message):
 
 
 def on_websocket_open():
-    helper.cloud_mode_link_helper.LINKED_CONTAINER_CACHE.clear()
+    cloud_mode_link_helper.LINKED_CONTAINER_CACHE.clear()
     add_haproxy_run_task("Websocket open")
 
 

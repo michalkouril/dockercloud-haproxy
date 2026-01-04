@@ -9,18 +9,20 @@ import signal
 import gevent
 import time
 import dockercloud
-import docker
+import docker as dockerapi
 from gevent import queue
 
-from haproxy.config import config
-from config import DEBUG, PID_FILE, HAPROXY_CONTAINER_URI, HAPROXY_SERVICE_URI, API_AUTH
-from eventhandler import on_user_reload, listen_docker_events_compose_mode, listen_dockercloud_events, \
+from . import config
+from .config import DEBUG, PID_FILE, HAPROXY_CONTAINER_URI, HAPROXY_SERVICE_URI, API_AUTH
+from .eventhandler import on_user_reload, listen_docker_events_compose_mode, listen_dockercloud_events, \
     polling_service_status_swarm_mode
 from haproxy import __version__
-import haproxycfg
-from haproxycfg import add_haproxy_run_task, run_haproxy, Haproxy
-from utils import save_to_file
-from config import RunningMode
+from . import haproxycfg
+from .haproxycfg import add_haproxy_run_task, run_haproxy, Haproxy
+from .utils import save_to_file, docker_inspect_container
+from .config import RunningMode
+
+from compose.cli.docker_client import docker_client
 
 dockercloud.user_agent = "dockercloud-haproxy/%s" % __version__
 dockercloud.api_timeout = 15
@@ -37,6 +39,7 @@ def create_pid_file():
 
 
 def main():
+
     logging.basicConfig(stream=sys.stdout)
     logging.getLogger("haproxy").setLevel(logging.DEBUG if DEBUG else logging.INFO)
     if DEBUG:
@@ -44,8 +47,11 @@ def main():
 
     config.RUNNING_MODE = check_running_mode(HAPROXY_CONTAINER_URI, HAPROXY_SERVICE_URI, API_AUTH)
 
-    gevent.signal(signal.SIGUSR1, on_user_reload)
-    gevent.signal(signal.SIGTERM, sys.exit)
+    signal_handler = getattr(gevent, "signal_handler", None)
+    if signal_handler is None:
+        signal_handler = gevent.signal
+    signal_handler(signal.SIGUSR1, on_user_reload)
+    signal_handler(signal.SIGTERM, sys.exit)
 
     gevent.spawn(run_haproxy)
 
@@ -95,9 +101,9 @@ def check_running_mode(container_uri, service_uri, api_auth):
         reason = ""
         try:
             try:
-                docker = docker.from_env()
+                docker = dockerapi.from_env()
             except:
-                docker = docker.from_env(os.environ)
+                docker = dockerapi.from_env(os.environ)
             docker.ping()
         except Exception as e:
             reason = "unable to connect to docker daemon %s" % e
@@ -110,7 +116,7 @@ def check_running_mode(container_uri, service_uri, api_auth):
                 mode = RunningMode.LegacyMode
             else:
                 try:
-                    container = docker.inspect_container(container_id)
+                    container = docker_inspect_container(docker, container_id)
                     if container.get("HostConfig", {}).get("Links", []):
                         reason = "dockercloud/haproxy container is running on default bridge"
                         mode = RunningMode.LegacyMode

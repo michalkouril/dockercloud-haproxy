@@ -31,10 +31,11 @@ def get_tcp_routes(details, routes, port, port_num):
     if port != port_num and port != port_num + "/ssl":
         return tcp_routes, routes_added
 
-    for _service_alias, routes in routes.items():
+    for _service_alias in sorted(routes.keys(), reverse=True):
+        routes_for_service = routes[_service_alias]
         tcp_ports = get_service_attribute(details, "tcp_ports", _service_alias)
         if tcp_ports and port in tcp_ports:
-            for route in routes:
+            for route in routes_for_service:
                 if route["port"] == port_num:
                     address = "%s:%s" % (route["addr"], route["port"])
                     if address not in addresses_added:

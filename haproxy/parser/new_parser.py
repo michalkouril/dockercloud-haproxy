@@ -17,7 +17,7 @@ class NewSpecs(Specs):
         for link in links.values():
             if link["service_name"] not in service_aliases:
                 service_aliases.append(link["service_name"])
-        return service_aliases
+        return sorted(service_aliases)
 
     @staticmethod
     def _parse_details(service_aliases, links):
@@ -30,19 +30,31 @@ class NewSpecs(Specs):
 
     @staticmethod
     def _parse_routes(details, links):
+        if not links:
+            return {}
+
         routes = {}
-        for link in links.values():
-            container_name = link["container_name"]
-            service_alias = link["service_name"]
-            if service_alias not in routes:
-                routes[service_alias] = []
-            for endpoint in link["endpoints"].values():
-                route = haproxy.config.BACKEND_MATCH.match(endpoint).groupdict()
-                route.update({"container_name": container_name})
-                exclude_ports = details.get(service_alias, {}).get("exclude_ports", [])
-                if not exclude_ports or (exclude_ports and route["port"] not in exclude_ports):
-                    if route not in routes[service_alias]:
-                        routes[service_alias].append(route)
+        service_aliases = sorted({link["service_name"] for link in links.values()})
+        for service_alias in service_aliases:
+            routes[service_alias] = []
+            service_links = [link for link in links.values() if link["service_name"] == service_alias]
+            service_links.sort(key=lambda link: link["container_name"], reverse=True)
+            for link in service_links:
+                container_name = link["container_name"]
+                def _endpoint_sort_key(endpoint):
+                    match = haproxy.config.BACKEND_MATCH.match(endpoint)
+                    if match:
+                        return (0, int(match.group("port")))
+                    return (1, endpoint)
+
+                endpoints = sorted(link["endpoints"].values(), key=_endpoint_sort_key)
+                for endpoint in endpoints:
+                    route = haproxy.config.BACKEND_MATCH.match(endpoint).groupdict()
+                    route.update({"container_name": container_name})
+                    exclude_ports = details.get(service_alias, {}).get("exclude_ports", [])
+                    if not exclude_ports or (exclude_ports and route["port"] not in exclude_ports):
+                        if route not in routes[service_alias]:
+                            routes[service_alias].append(route)
         return routes
 
 

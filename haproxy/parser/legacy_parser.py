@@ -28,7 +28,7 @@ class LegacySpecs(Specs):
 
                 if alias not in service_aliases:
                     service_aliases.append(alias)
-        return service_aliases
+        return sorted(service_aliases)
 
     @staticmethod
     def _parse_details(service_aliases, envvars):

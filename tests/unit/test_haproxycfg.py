@@ -94,14 +94,14 @@ class HaproxyConfigSSLTestCase(unittest.TestCase):
         haproxy = Haproxy()
         haproxy.ssl_bind_string = ""
         haproxy._config_ssl()
-        self.assertEquals("ssl certs ssl cacerts", haproxy.ssl_bind_string)
+        self.assertEqual("ssl certs ssl cacerts", haproxy.ssl_bind_string)
 
         mock_certs.return_value = ""
         mock_cacerts.return_value = ""
         haproxy = Haproxy()
         haproxy.ssl_bind_string = ""
         haproxy._config_ssl()
-        self.assertEquals("", haproxy.ssl_bind_string)
+        self.assertEqual("", haproxy.ssl_bind_string)
 
     @mock.patch("haproxy.haproxycfg.SslHelper.save_certs")
     @mock.patch("haproxy.haproxycfg.SslHelper.get_extra_ssl_certs")

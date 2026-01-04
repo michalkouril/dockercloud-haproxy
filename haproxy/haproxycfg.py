@@ -5,19 +5,20 @@ from collections import OrderedDict
 import gevent
 from compose.cli.docker_client import docker_client
 
-import config
-import helper.backend_helper as BackendHelper
-import helper.cloud_mode_link_helper as CloudModeLinkHelper
-import helper.compose_mode_link_helper as ComposeModeLinkHelper
-import helper.config_helper as ConfigHelper
-import helper.frontend_helper as FrontendHelper
-import helper.ssl_helper as SslHelper
-import helper.swarm_mode_link_helper as SwarmModeLinkHelper
-import helper.tcp_helper as TcpHelper
-import helper.update_helper as UpdateHelper
-from haproxy.config import *
-from haproxy.parser import LegacySpecs, NewSpecs
-from utils import fetch_remote_obj, prettify, save_to_file, get_service_attribute, get_bind_string
+from . import config
+from .helper import backend_helper as BackendHelper
+from .helper import cloud_mode_link_helper as CloudModeLinkHelper
+from .helper import compose_mode_link_helper as ComposeModeLinkHelper
+from .helper import config_helper as ConfigHelper
+from .helper import frontend_helper as FrontendHelper
+from .helper import ssl_helper as SslHelper
+from .helper import swarm_mode_link_helper as SwarmModeLinkHelper
+from .helper import tcp_helper as TcpHelper
+from .helper import update_helper as UpdateHelper
+from .config import *
+from .parser import LegacySpecs, NewSpecs
+from .utils import fetch_remote_obj, prettify, save_to_file, get_service_attribute, get_bind_string, \
+    docker_inspect_container
 
 logger = logging.getLogger("haproxy")
 
@@ -134,7 +135,7 @@ class Haproxy(object):
                 docker = docker_client(os.environ)
             docker.ping()
             container_id = os.environ.get("HOSTNAME", "")
-            haproxy_container = docker.inspect_container(container_id)
+            haproxy_container = docker_inspect_container(docker, container_id)
         except Exception as e:
             logger.info("Docker API error, regressing to legacy links mode: %s" % e)
             return None
@@ -169,7 +170,7 @@ class Haproxy(object):
             cfg_dict.update(self._config_aditional_backends_sections())
             cfg_dict.update(self._config_aditional_comment_sections("This is the end"))
 
-            cfg = prettify(cfg_dict)
+            cfg = prettify(cfg_dict) + "\n\n"
             self._update_haproxy(cfg)
         else:
             logger.info("Internal error: Specs is not initialized")
@@ -241,11 +242,11 @@ class Haproxy(object):
                       "log %s local1 notice" % RSYSLOG_DESTINATION,
                       "log-send-hostname",
                       "maxconn %s" % MAXCONN,
-                      "pidfile /var/run/haproxy.pid",
+                      "pidfile %s" % HAPROXY_PID_FILE,
                       "user %s" % HAPROXY_USER,
                       "group %s" % HAPROXY_GROUP,
                       "daemon",
-                      "stats socket /var/run/haproxy.stats level admin"]
+                      "stats socket %s level admin" % STATS_SOCKET]
 
         if NBPROC > 1:
             statements.append("nbproc %s" % NBPROC)
@@ -280,7 +281,7 @@ class Haproxy(object):
                                "timeout client 1m",
                                "timeout server 1m",
                                "stats hide-version",
-                               "stats realm Haproxy\ Statistics",
+                               "stats realm Haproxy\\ Statistics",
                                "stats uri /",
                                "stats auth %s" % STATS_AUTH]
         return cfg
@@ -316,8 +317,8 @@ class Haproxy(object):
                 if auth.strip():
                     terms = auth.strip().split(":", 1)
                     if len(terms) == 2:
-                        username = terms[0].replace("\,", ",")
-                        password = terms[1].replace("\,", ",")
+                        username = terms[0].replace("\\,", ",")
+                        password = terms[1].replace("\\,", ",")
                         userlist.append("user %s %s %s" % (username, type, password))
         return userlist
 
@@ -338,9 +339,17 @@ class Haproxy(object):
         if not get_service_attribute(details, "tcp_ports"):
             return cfg
 
-        tcp_ports = TcpHelper.get_tcp_port_list(details, services_aliases)
+        tcp_ports = []
+        for service_alias in services_aliases:
+            service_ports = get_service_attribute(details, "tcp_ports", service_alias)
+            if not service_ports:
+                continue
+            for tcp_port in reversed(service_ports):
+                if tcp_port in tcp_ports:
+                    tcp_ports.remove(tcp_port)
+                tcp_ports.append(tcp_port)
 
-        for tcp_port in set(tcp_ports):
+        for tcp_port in tcp_ports:
             tcp_section, port_num = self._get_tcp_section(details, services_aliases, tcp_port)
             self.tcp_ports.add(port_num)
             cfg["listen port_%s" % port_num] = tcp_section
